@@ -50,3 +50,14 @@ nsqCleanup.deleteUnusedChannels('http://127.0.0.1:4151', 'my-topic', function(er
   if(err) throw err;
 });
  ```
+
+In following example, `nsq-cleanup` API is used in conjuction with `node-schedule` module to delete unused channels in `my-topic` topic periodically.
+```javascript
+var nsqCleanup = require('nsq-cleanup');
+var jobScheduler = require('node-schedule');
+jobScheduler.scheduleJob('1 * * * * *', function() {
+  nsqCleanup.deleteUnusedChannels('http://127.0.0.1:4151', 'my-topic', function(err){
+    if(err) throw err;
+  });
+});
+```
