@@ -10,17 +10,36 @@ describe('nsq-cleanup', function(){
 
   beforeEach(function(){
     options = {
-      url   : 'http://127.0.0.1:4151',
+      host  : 'http://127.0.0.1:4151',
       topic : 'sample_topic'
     };
     sinon.stub(request, 'post');
-    sinon.stub(lib, 'deleteChannel');
   });
 
 
   afterEach(function(){
     request.post.restore();
-    lib.deleteChannel.restore();
+  });
+
+
+  it('Should delete given channel', function(done){
+    options.channel = 'my-channel';
+    request.post.yields(null);
+
+    lib.deleteChannel(options, function(err) {
+      if(err) return done(err);
+
+      request.post.callCount.should.equal(1);
+      var endpoint = request.post.firstCall.args[0];
+      var opts     = request.post.firstCall.args[1];
+
+      endpoint.should.equal(options.host + '/channel/delete');
+      opts.qs.topic.should.equal(options.topic);
+      opts.qs.channel.should.equal(options.channel);
+
+      done();
+    });
+
   });
 
   it('Should delete only unused channels', function(done){
@@ -38,9 +57,9 @@ describe('nsq-cleanup', function(){
     };
 
     request.post.yields(null, {body: body}, body);
-    lib.deleteChannel.yields(null);
+    sinon.stub(lib, 'deleteChannel').yields(null);
 
-    lib.deleteUnusedChannels(options.url, options.topic, function(err, count){
+    lib.deleteUnusedChannels(options.host, options.topic, function(err, count){
       if(err) return done(err);
 
       lib.deleteChannel.yields(null);
@@ -53,6 +72,7 @@ describe('nsq-cleanup', function(){
         channel : 'left_over_channel'
       });
 
+      lib.deleteChannel.restore();
       done();
     });
   });

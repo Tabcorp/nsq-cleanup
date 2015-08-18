@@ -2,7 +2,7 @@
 
 
 var program = require('commander');
-var lib     = require('../');
+var lib     = require('./');
 
 
 program

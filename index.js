@@ -3,7 +3,7 @@ var request = require('request');
 var async   = require('async');
 
 
-function emptyChannel(channel){
+function emptyChannel(channel) {
   return channel.clients.length == 0;
 }
 
@@ -15,7 +15,7 @@ module.exports.deleteUnusedChannels = function deleteUnusedChannels(host, topic,
     json   : true
   }
 
-  request.post(endpoint, options, function(err, response, body){
+  request.post(endpoint, options, function(err, response, body) {
     if(err) return callback(err);
 
     var nsqTopics      = body.data.topics;
@@ -28,7 +28,7 @@ module.exports.deleteUnusedChannels = function deleteUnusedChannels(host, topic,
                           .pluck('channel_name')
                           .value();
 
-    var tasks          = _.map(unusedChannels, function(channel){
+    var tasks          = _.map(unusedChannels, function(channel) {
                             return {channel:channel, topic: topic, host:host}
                           });
 
@@ -36,10 +36,10 @@ module.exports.deleteUnusedChannels = function deleteUnusedChannels(host, topic,
 
     var deletedChannels = 0;
     var q               = async.queue(module.exports.deleteChannel, 1);
-    q.drain             = function(){
+    q.drain             = function() {
       callback(null, deletedChannels);
     }
-    q.push(tasks, function(err, channelName){
+    q.push(tasks, function(err, channelName) {
       if(err) return;
       deletedChannels++;
     });
@@ -47,7 +47,7 @@ module.exports.deleteUnusedChannels = function deleteUnusedChannels(host, topic,
 }
 
 
-module.exports.deleteChannel = function deleteChannel(opts, callback){
+module.exports.deleteChannel = function deleteChannel(opts, callback) {
   var endpoint = opts.host + '/channel/delete';
   var options  = {
     qs: {
@@ -57,7 +57,7 @@ module.exports.deleteChannel = function deleteChannel(opts, callback){
     timeout: 5 * 1000,
     json: true
   };
-  request.post(endpoint, options, function(err, response, body){
+  request.post(endpoint, options, function(err, response, body) {
     if(err) return callback(err);
     callback();
   });
