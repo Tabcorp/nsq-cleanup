@@ -13,11 +13,13 @@ describe('nsq-cleanup', function(){
       host  : 'http://127.0.0.1:4151',
       topic : 'sample_topic'
     };
+    sinon.stub(request, 'get');
     sinon.stub(request, 'post');
   });
 
 
   afterEach(function(){
+    request.get.restore();
     request.post.restore();
   });
 
@@ -56,7 +58,7 @@ describe('nsq-cleanup', function(){
       }
     };
 
-    request.post.yields(null, {body: body}, body);
+    request.get.yields(null, {body: body}, body);
     sinon.stub(lib, 'deleteChannel').yields(null);
 
     lib.deleteUnusedChannels(options.host, options.topic, function(err, count){

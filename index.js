@@ -15,7 +15,7 @@ module.exports.deleteUnusedChannels = function deleteUnusedChannels(host, topic,
     json   : true
   }
 
-  request.post(endpoint, options, function(err, response, body) {
+  request.get(endpoint, options, function(err, response, body) {
     if(err) return callback(err);
 
     var nsqTopics      = body.data.topics;
